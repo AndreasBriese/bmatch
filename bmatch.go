@@ -41,9 +41,9 @@ import (
 	"errors"
 
 	// bcj "github.com/AndreasBriese/bmatch/bcjsearch"
-	bh2 "./bh2search"
-	bh "./bhsearch"
-	bsf "./bs_fsbndm"
+	bh2 "github.com/AndreasBriese/bmatch/bh2search"
+	bh "github.com/AndreasBriese/bmatch/bhsearch"
+	bsf "github.com/AndreasBriese/bmatch/bs_fsbndm"
 )
 
 var ALPHABET = 256
