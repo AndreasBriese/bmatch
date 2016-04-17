@@ -14,6 +14,7 @@ Go provides different search mechanisms to find the indices of a fixed string or
 * strings.Replace for single string replacing invokes a Boyer-Moore search over a string in /usr/local/go/src/strings/search.go implementing a stringFinder type
 * bytes.Index using generic assembler code (bytes•IndexByte(..)) to find the index of the first element of the pattern (i.e. for OSX/darwin see /usr/local/go/src/runtime/asm_amd64.s) and then compares the following sequence using another assembler function (Equal(..)).
 
+The before mentioned assembler routines compare each byte of the haystack one by one. See unsafeMEMCHR.go for a faster approach. 
 All but the Boyer-Moore search are relatively slow - even in comparison to python str.find function (implemented in C).
 bmatch's underlying algorithms outperform all of Go's search functions.
 
