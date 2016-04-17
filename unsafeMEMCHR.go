@@ -34,6 +34,10 @@
  *    commentary by Jim Blandy (jimb@ai.mit.edu).
  */
 
+// .. and another issue: if package "unsafe" is removed from Go in future
+// these functions for 1 byte long patterns must become replaced by the (slower)
+// bytes.Index() function.
+
 package bmatch
 
 import (
