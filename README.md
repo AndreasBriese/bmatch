@@ -63,5 +63,5 @@ __Benchmarks__ (`go test -bench . cpu=1`)
  `go test` will try to download the test corpus from http://archive.org if it is not present in the folder. 
  
  __License__   
- bmatch.go is MIT licensed - see the headers in the code in the subfolders of the various search algorithms for details and reference to their predecessors (C-code mostly taken from the SMART tool http://www.dmi.unict.it/~faro/smart/ v.13.02). 
+ bmatch.go (C)opyright 2016 Andreas Briese, eduToolbox@Bri-C GmbH, Sarstedt, with MIT license - see the headers in the code in the subfolders of the various search algorithms for details and reference to their predecessors (C-code mostly taken from the SMART tool http://www.dmi.unict.it/~faro/smart/ v.13.02). 
  
