@@ -21,7 +21,7 @@ bmatch's underlying algorithms outperform all of Go's search functions.
 
 __Usage__
 
-Install bmatch.go by the usual
+Install bmatch by the usual
 
     go get github.com/AndreasBriese/bmatch
 
