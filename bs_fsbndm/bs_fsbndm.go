@@ -83,31 +83,3 @@ func FindAll(haystack, needle *[]byte) (found []int, e error) {
 
 	return findALL(haystack, needle), nil
 }
-
-func FindAllCC(haystack, needle *[]byte, startIdx, partLen, bufLen int, threads chan bool) *[]int {
-
-	found := []int{}
-
-	// check length needle
-	if len(*haystack) < len(*needle) {
-		return &found
-	}
-	if len(*needle) < 2 {
-		return &found
-	}
-
-	return findALL_CC(haystack, needle, startIdx, partLen, bufLen, threads)
-}
-
-func FindIndexCC(haystack, needle *[]byte, startIdx, partLen int, breaker chan int, threads chan bool) int {
-
-	// check length needle
-	if len(*haystack) < len(*needle) {
-		return -1
-	}
-	if len(*needle) < 2 {
-		return -1
-	}
-
-	return findFI_CC(haystack, needle, startIdx, partLen, breaker, threads)
-}

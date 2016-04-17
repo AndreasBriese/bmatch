@@ -23,11 +23,14 @@
 /*
  * 'nos esse quasi nanos gigantum umeris insidentes' (Bernhard von Chartres, 1120)
  * The giants in this respect:
- * This is a modification of the Hash3 algorithm published by Lecroc, 2007
+ * This is inspired by the Hash3 algorithm published by Lecroc, 2007
  * LECROQ, T. 2007. Fast exact string matching algorithms. Inf. Process. Lett. 102, 6, 229–235.
- * consisting of two modifications:
+ * modifications:
+ *   hashing two subsequent characters instead of three in hash3
  *   a different hash function reducing hash by one shift operation
- *   and a different candidate comparison logic (zigzag)
+ *   and a different candidate comparison logic (bitwise computation comparison)
+ *   bh2search is only efficient on (very) long patterns and not too small alphabets!
+ *   Therefore it may be used on patterns of lengths that turn the speed curve of Hash3 again (i.e. > 2^17)
  */
 
 package bh2search
@@ -80,32 +83,4 @@ func FindAll(haystack, needle *[]byte) (found []int, e error) {
 	}
 
 	return findALL(haystack, needle), nil
-}
-
-func FindAllCC(haystack, needle *[]byte, startIdx, partLen, bufLen int, threads chan bool) *[]int {
-
-	found := []int{}
-
-	// check length needle
-	if len(*haystack) < len(*needle) {
-		return &found
-	}
-	if len(*needle) < 2 {
-		return &found
-	}
-
-	return findALL_CC(haystack, needle, startIdx, partLen, bufLen, threads)
-}
-
-func FindIndexCC(haystack, needle *[]byte, startIdx, partLen int, breaker chan int, threads chan bool) int {
-
-	// check length needle
-	if len(*haystack) < len(*needle) {
-		return -1
-	}
-	if len(*needle) < 2 {
-		return -1
-	}
-
-	return findFI_CC(haystack, needle, startIdx, partLen, breaker, threads)
 }
