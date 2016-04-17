@@ -21,9 +21,9 @@ bmatch's underlying algorithms outperform all of Go's search functions.
 
 __Usage__
 
-Load bmatch.go by the usual
+Install bmatch.go by the usual
 
-    go get github.com/AndreasBriese/bmatch.go
+    go get github.com/AndreasBriese/bmatch
 
 In your go code use `import "github.com/AndreasBriese/bmatch"` and apply it on **[]byte** types of the haystack (byte sequence to search in) and needle (pattern to search for).
 
