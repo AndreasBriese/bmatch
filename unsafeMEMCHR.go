@@ -25,7 +25,7 @@
  * The giants in this respect:
  * func memchr(haystack, patttern)
  * This native Go 64-bit algorithm derives
- * from insides into the 32bit implementation in c at
+ * from insights into the 32bit implementation in c at
  * http://www.stdlib.net/~colmmacc/strlen.c.html
  * Copyright (C) 1991, 1993, 1997, 2000, 2003 Free Software Foundation, Inc.
  * part of the GNU C Library.
