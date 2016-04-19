@@ -41,6 +41,8 @@
 package bmatch
 
 import (
+	"bytes"
+	"runtime"
 	"unsafe"
 )
 
@@ -54,61 +56,69 @@ import (
 func mmIndex(haystack, needle *[]byte) int {
 
 	var (
-		pat            = *needle
-		lastCharIdx    = len(pat) - 1
-		char           = pat[lastCharIdx]
-		hayst          = *haystack
-		n              = len(hayst)
-		readIdx        = uintptr(unsafe.Pointer(&hayst[0]))
-		maxIdx         = readIdx + uintptr(len(hayst))
-		limIdx         = uintptr(maxIdx >> 3 << 3)
-		hay, NOT_hay   uint64
-		needleMask     uint64
-		idx, uint64Idx int
-		magicBITS      = uint64(0x7efefefefefefeff)
-		NOT_magicBITS  = uint64(0xffffffffffffffff) ^ magicBITS // go has no bitwise '~' operator
+		pat         = *needle
+		lastCharIdx = len(pat) - 1
+		char        = pat[lastCharIdx]
+		hayst       = *haystack
+		n           = len(hayst)
 	)
 
 	if n < len(pat) {
 		return -1
 	}
 
-	// prepare index mask &
-	// prepare needleMask mask
-	for i := uint8(0); i < 7; i++ {
-		needleMask |= uint64(char)
-		needleMask <<= 8
-	}
-	needleMask |= uint64(char)
+	switch runtime.GOARCH == "386" || runtime.GOARCH == "amd64" {
+	case true:
+		var (
+			readIdx        = uintptr(unsafe.Pointer(&hayst[0]))
+			maxIdx         = readIdx + uintptr(len(hayst))
+			limIdx         = uintptr(maxIdx >> 3 << 3)
+			hay, NOT_hay   uint64
+			needleMask     uint64
+			idx, uint64Idx int
+			magicBITS      = uint64(0x7efefefefefefeff)
+			NOT_magicBITS  = uint64(0xffffffffffffffff) ^ magicBITS // go has no bitwise '~' operator
+		)
 
-	// run over haystack
-	uint64Idx = 0
-	for {
-		hay = *(*uint64)(unsafe.Pointer(readIdx))
-		hay ^= needleMask
-		NOT_hay = uint64(0xffffffffffffffff) ^ hay // go has no bitwise '~' operator
-		if (((hay + magicBITS) ^ NOT_hay) & NOT_magicBITS) != 0 {
-			for idx = 0; idx < 8; idx++ {
-				if hay<<uint((7-idx)<<3)>>56 == 0 {
-					return uint64Idx + idx
+		// prepare index mask &
+		// prepare needleMask mask
+		for i := uint8(0); i < 7; i++ {
+			needleMask |= uint64(char)
+			needleMask <<= 8
+		}
+		needleMask |= uint64(char)
+
+		// run over haystack
+		uint64Idx = 0
+		for {
+			hay = *(*uint64)(unsafe.Pointer(readIdx))
+			hay ^= needleMask
+			NOT_hay = uint64(0xffffffffffffffff) ^ hay // go has no bitwise '~' operator
+			if (((hay + magicBITS) ^ NOT_hay) & NOT_magicBITS) != 0 {
+				for idx = 0; idx < 8; idx++ {
+					if hay<<uint((7-idx)<<3)>>56 == 0 {
+						return uint64Idx + idx
+					}
 				}
 			}
-		}
-		readIdx += 8
-		uint64Idx += 8
-		if readIdx < limIdx {
-			continue
-		}
-		break
-	}
-	if n%8 != 0 {
-		uint64Idx -= 8
-		for uint64Idx < len(hayst) {
-			if hayst[uint64Idx] == char {
-				return uint64Idx
+			readIdx += 8
+			uint64Idx += 8
+			if readIdx < limIdx {
+				continue
 			}
-			uint64Idx++
+			break
 		}
+		if n%8 != 0 {
+			uint64Idx -= 8
+			for uint64Idx < len(hayst) {
+				if hayst[uint64Idx] == char {
+					return uint64Idx
+				}
+				uint64Idx++
+			}
+		}
+	case false:
+		return bytes.Index(hayst, pat)
 	}
 
 	return -1
@@ -125,19 +135,11 @@ func mmIndex(haystack, needle *[]byte) int {
 func mmFindALL(haystack, needle *[]byte) (found []int) {
 
 	var (
-		pat            = *needle
-		lastCharIdx    = len(pat) - 1
-		char           = pat[lastCharIdx]
-		hayst          = *haystack
-		n              = len(hayst)
-		readIdx        = uintptr(unsafe.Pointer(&hayst[0]))
-		maxIdx         = readIdx + uintptr(len(hayst))
-		limIdx         = uintptr(maxIdx >> 3 << 3)
-		hay, NOT_hay   uint64
-		needleMask     uint64
-		idx, uint64Idx int
-		magicBITS      = uint64(0x7efefefefefefeff)
-		NOT_magicBITS  = uint64(0xffffffffffffffff) ^ magicBITS // go has no bitwise '~' operator
+		pat         = *needle
+		lastCharIdx = len(pat) - 1
+		char        = pat[lastCharIdx]
+		hayst       = *haystack
+		n           = len(hayst)
 	)
 
 	if n < len(pat) {
@@ -147,43 +149,71 @@ func mmFindALL(haystack, needle *[]byte) (found []int) {
 	buflen := 10 + (n/(1+lastCharIdx))>>3
 	found = make([]int, 0, buflen)
 
-	// prepare index mask &
-	// prepare needleMask mask
-	for i := uint8(0); i < 7; i++ {
-		needleMask |= uint64(char)
-		needleMask <<= 8
-	}
-	needleMask |= uint64(char)
+	switch runtime.GOARCH == "386" || runtime.GOARCH == "amd64" {
+	case true:
+		var (
+			readIdx        = uintptr(unsafe.Pointer(&hayst[0]))
+			maxIdx         = readIdx + uintptr(len(hayst))
+			limIdx         = uintptr(maxIdx >> 3 << 3)
+			hay, NOT_hay   uint64
+			needleMask     uint64
+			idx, uint64Idx int
+			magicBITS      = uint64(0x7efefefefefefeff)
+			NOT_magicBITS  = uint64(0xffffffffffffffff) ^ magicBITS // go has no bitwise '~' operator
+		)
 
-	// run over haystack
-	uint64Idx = 0
-	for {
-		hay = *(*uint64)(unsafe.Pointer(readIdx))
-		hay ^= needleMask
-		NOT_hay = uint64(0xffffffffffffffff) ^ hay // go has no bitwise '~' operator
-		if (((hay + magicBITS) ^ NOT_hay) & NOT_magicBITS) != 0 {
-			for idx = 0; idx < 8; idx++ {
-				if hay<<uint((7-idx)<<3)>>56 == 0 {
-					found = append(found, uint64Idx+idx)
+		// prepare index mask &
+		// prepare needleMask mask
+		for i := uint8(0); i < 7; i++ {
+			needleMask |= uint64(char)
+			needleMask <<= 8
+		}
+		needleMask |= uint64(char)
+
+		// run over haystack
+		uint64Idx = 0
+		for {
+			hay = *(*uint64)(unsafe.Pointer(readIdx))
+			hay ^= needleMask
+			NOT_hay = uint64(0xffffffffffffffff) ^ hay // go has no bitwise '~' operator
+			if (((hay + magicBITS) ^ NOT_hay) & NOT_magicBITS) != 0 {
+				for idx = 0; idx < 8; idx++ {
+					if hay<<uint((7-idx)<<3)>>56 == 0 {
+						found = append(found, uint64Idx+idx)
+					}
 				}
 			}
-		}
-		readIdx += 8
-		uint64Idx += 8
-		if readIdx < limIdx {
-			continue
-		}
-		break
-	}
-	if n%8 != 0 {
-		uint64Idx -= 8
-		for uint64Idx < len(hayst) {
-			if hayst[uint64Idx] == char {
-				found = append(found, uint64Idx)
+			readIdx += 8
+			uint64Idx += 8
+			if readIdx < limIdx {
+				continue
 			}
-			uint64Idx++
+			break
 		}
+		if n%8 != 0 {
+			uint64Idx -= 8
+			for uint64Idx < len(hayst) {
+				if hayst[uint64Idx] == char {
+					found = append(found, uint64Idx)
+				}
+				uint64Idx++
+			}
+		}
+	case false:
+		var idx, lastIdx int
+
+		for {
+			idx = bytes.Index(hayst, pat)
+			if idx == -1 {
+				break
+			}
+			found = append(found, lastIdx+idx)
+			lastIdx += idx + 1
+			hayst = hayst[idx+1:]
+		}
+
 	}
+
 	return found
 }
 
@@ -197,61 +227,78 @@ func mmFindALL(haystack, needle *[]byte) (found []int) {
 func mmCount(haystack, needle *[]byte) (count int) {
 
 	var (
-		pat            = *needle
-		lastCharIdx    = len(pat) - 1
-		char           = pat[lastCharIdx]
-		hayst          = *haystack
-		n              = len(hayst)
-		readIdx        = uintptr(unsafe.Pointer(&hayst[0]))
-		maxIdx         = readIdx + uintptr(len(hayst))
-		limIdx         = uintptr(maxIdx >> 3 << 3)
-		hay, NOT_hay   uint64
-		needleMask     uint64
-		idx, uint64Idx int
-		magicBITS      = uint64(0x7efefefefefefeff)
-		NOT_magicBITS  = uint64(0xffffffffffffffff) ^ magicBITS // go has no bitwise '~' operator
+		pat         = *needle
+		lastCharIdx = len(pat) - 1
+		char        = pat[lastCharIdx]
+		hayst       = *haystack
+		n           = len(hayst)
 	)
 
 	if n < len(pat) {
 		return count
 	}
 
-	// prepare index mask &
-	// prepare needleMask mask
-	for i := uint8(0); i < 7; i++ {
-		needleMask |= uint64(char)
-		needleMask <<= 8
-	}
-	needleMask |= uint64(char)
+	switch runtime.GOARCH == "386" || runtime.GOARCH == "amd64" {
+	case true:
+		var (
+			readIdx        = uintptr(unsafe.Pointer(&hayst[0]))
+			maxIdx         = readIdx + uintptr(len(hayst))
+			limIdx         = uintptr(maxIdx >> 3 << 3)
+			hay, NOT_hay   uint64
+			needleMask     uint64
+			idx, uint64Idx int
+			magicBITS      = uint64(0x7efefefefefefeff)
+			NOT_magicBITS  = uint64(0xffffffffffffffff) ^ magicBITS // go has no bitwise '~' operator
+		)
 
-	// run over haystack
-	uint64Idx = 0
-	for {
-		hay = *(*uint64)(unsafe.Pointer(readIdx))
-		hay ^= needleMask
-		NOT_hay = uint64(0xffffffffffffffff) ^ hay // go has no bitwise '~' operator
-		if (((hay + magicBITS) ^ NOT_hay) & NOT_magicBITS) != 0 {
-			for idx = 0; idx < 8; idx++ {
-				if hay<<uint((7-idx)<<3)>>56 == 0 {
-					count++
+		// prepare index mask &
+		// prepare needleMask mask
+		for i := uint8(0); i < 7; i++ {
+			needleMask |= uint64(char)
+			needleMask <<= 8
+		}
+		needleMask |= uint64(char)
+
+		// run over haystack
+		uint64Idx = 0
+		for {
+			hay = *(*uint64)(unsafe.Pointer(readIdx))
+			hay ^= needleMask
+			NOT_hay = uint64(0xffffffffffffffff) ^ hay // go has no bitwise '~' operator
+			if (((hay + magicBITS) ^ NOT_hay) & NOT_magicBITS) != 0 {
+				for idx = 0; idx < 8; idx++ {
+					if hay<<uint((7-idx)<<3)>>56 == 0 {
+						count++
+					}
 				}
 			}
-		}
-		readIdx += 8
-		uint64Idx += 8
-		if readIdx < limIdx {
-			continue
-		}
-		break
-	}
-
-	if n%8 != 0 {
-		uint64Idx = n - n%8
-		for uint64Idx < len(hayst) {
-			if hayst[uint64Idx] == char {
-				count++
+			readIdx += 8
+			uint64Idx += 8
+			if readIdx < limIdx {
+				continue
 			}
-			uint64Idx++
+			break
+		}
+
+		if n%8 != 0 {
+			uint64Idx = n - n%8
+			for uint64Idx < len(hayst) {
+				if hayst[uint64Idx] == char {
+					count++
+				}
+				uint64Idx++
+			}
+		}
+
+	case false:
+		idx := 0
+		for {
+			idx = bytes.Index(hayst, pat)
+			if idx == -1 {
+				break
+			}
+			count++
+			hayst = hayst[idx+1:]
 		}
 	}
 
