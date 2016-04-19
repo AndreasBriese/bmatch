@@ -22,7 +22,6 @@ package bmatch
 
 import (
 	"archive/zip"
-	// "bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -30,7 +29,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	// "sort"
 	"strings"
 	"testing"
 	"time"
@@ -186,7 +184,7 @@ func TestM_FindAll_BoyerMooreVSBytesIndexVSBmatch(t *testing.T) {
 		r1, _ = strBMFindAll(&haystack, &needle)
 		r2, _ = bytesIndexFindAll(&hay, &(pat[i]))
 		r3, _ = FindAll(&hay, &(pat[i]))
-		if len(r1) != len(r2) || len(r2) != len(r1) {
+		if len(r1) != len(r2) || len(r2) != len(r3) {
 			errCnt++
 			continue
 		}
