@@ -19,7 +19,9 @@ All but the Boyer-Moore search are relatively slow - even in comparison to pytho
 bmatch's underlying algorithms outperform all of Go's search functions.
 
 ---
+
 __If you installed bmatch before 2016-03-20 it is recommended that you reinstall bmatch as there was a bugfix for "needles at haystack start"__ 
+
 ---
 
 
