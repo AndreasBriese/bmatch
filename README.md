@@ -18,6 +18,10 @@ The before mentioned assembler routines compare each byte of the haystack one by
 All but the Boyer-Moore search are relatively slow - even in comparison to python str.find function (implemented in C).
 bmatch's underlying algorithms outperform all of Go's search functions.
 
+---
+__If you installed bmatch before 2016-03-20 it is recommended that you reinstall bmatch as there was a bugfix for "needles at haystack start"__ 
+---
+
 
 __Usage__
 
