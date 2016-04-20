@@ -69,8 +69,8 @@ func findFI(haystack, pattern *[]byte) int {
 	}
 
 	// search
-	if bytes.Equal(hay, needle) {
-		return 1
+	if bytes.Equal(hay[0:m], needle) {
+		return 0
 	}
 
 	if longPat { // search for the suffix length p of m
@@ -122,6 +122,11 @@ func findFI(haystack, pattern *[]byte) int {
 			i += m
 		}
 	}
+
+	if bytes.Equal(hay[n-m:], needle) {
+		return n - m
+	}
+
 	return -1
 }
 
@@ -161,7 +166,7 @@ func findALL(haystack, pattern *[]byte) (found []int) {
 	}
 
 	// search
-	if bytes.Equal(hay, needle) {
+	if bytes.Equal(hay[0:m], needle) {
 		found = append(found, 0)
 	}
 
@@ -259,7 +264,7 @@ func count(haystack, pattern *[]byte) (count int) {
 	}
 
 	// search
-	if bytes.Equal(hay, needle) {
+	if bytes.Equal(hay[0:m], needle) {
 		count++
 	}
 
