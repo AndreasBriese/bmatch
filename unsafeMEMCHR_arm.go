@@ -58,7 +58,6 @@ func mmIndex(haystack, needle *[]byte) int {
 	var (
 		pat         = *needle
 		lastCharIdx = len(pat) - 1
-		char        = pat[lastCharIdx]
 		hayst       = *haystack
 		n           = len(hayst)
 	)
@@ -83,7 +82,6 @@ func mmFindALL(haystack, needle *[]byte) (found []int) {
 	var (
 		pat         = *needle
 		lastCharIdx = len(pat) - 1
-		char        = pat[lastCharIdx]
 		hayst       = *haystack
 		n           = len(hayst)
 	)
@@ -122,7 +120,6 @@ func mmCount(haystack, needle *[]byte) (count int) {
 	var (
 		pat         = *needle
 		lastCharIdx = len(pat) - 1
-		char        = pat[lastCharIdx]
 		hayst       = *haystack
 		n           = len(hayst)
 	)
