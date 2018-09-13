@@ -2,6 +2,7 @@
 __bmatch.go__
 =============
 ---
+[![Build Status](https://travis-ci.org/AndreasBriese/bmatch.png?branch=master)](http://travis-ci.org/AndreasBriese/bmatch)
 
 bmatch is faster fixed pattern search for Go.
 
